@@ -1,27 +1,26 @@
-/*
-CRUD:
 
-Create     
-Read one     
-Read all    x
-Update
-Delete
-
-*/
 import express from "express";
 import cors from "cors";
 import { Client } from "pg";
-
+import dotenv from "dotenv";
+dotenv.config();
 //As your database is on your local machine, with default port,
 //and default username and password,
 //we only need to specify the (non-default) database name.
 
+//we'll automatically assume we want to connect to heroku if 
+// the NODE_ENV var is set to 'production' (as that will 
+// indicate this server is running on heroku).
+// But you could set this to true for other reasons if you wanted to connect dev to heroku.
+const connectToHeroku = process.env.NODE_ENV === 'production';
+
 const config = {
   connectionString: process.env.DATABASE_URL,
-  ssl: {
+  ssl: connectToHeroku ? {
     rejectUnauthorized: false
-  }
-}
+  } : false
+};
+console.log({ config, connectToHeroku, nodeEnv: process.env.NODE_ENV });
 const client = new Client(config);
 
 //TODO: this request for a connection will not necessarily complete before the first HTTP request is made!
