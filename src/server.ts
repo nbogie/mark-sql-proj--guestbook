@@ -1,3 +1,13 @@
+/*
+CRUD:
+
+Create     
+Read one     
+Read all    x
+Update
+Delete
+
+*/
 import express from "express";
 import cors from "cors";
 import { Client } from "pg";
@@ -26,7 +36,9 @@ app.use(express.json());
 
 //When this route is called, return the most recent 100 signatures in the db
 app.get("/signatures", async (req, res) => {
-  const signatures = null; //FIXME-TASK: get signatures from db!
+  const dbResult = await client.query("select * from signatures limit 100");
+  const signatures = dbResult.rows;
+
   res.status(200).json({
     status: "success",
     data: {
@@ -62,7 +74,9 @@ app.get("/signatures/:id", async (req, res) => {
 app.post("/signatures", async (req, res) => {
   const { name, message } = req.body;
   if (typeof name === "string") {
-    const createdSignature = null; //FIXME-TASK: insert the supplied signature object into the DB
+    const dbResult = await client.query("insert into signatures (signature, message) values ($1, $2) returning *", [name, message]);
+
+    const createdSignature = dbResult.rows[0];
 
     res.status(201).json({
       status: "success",
